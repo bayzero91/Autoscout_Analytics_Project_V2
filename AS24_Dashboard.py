@@ -28,7 +28,7 @@ st.title('AutoScout24 Dashboard')
 
 # must have selection:
 st.sidebar.title('Navigation and Model Selection')
-make = st.sidebar.selectbox('Select the car make', data['make'].unique())
+make = st.sidebar.selectbox('Select the brand', data['make'].unique())
 model = st.sidebar.selectbox('Select the car model', np.sort(gb_make_to_model[make]))
 
 # optional selection:
@@ -41,7 +41,8 @@ year_on = st.sidebar.toggle('Optional selection for Year', False)
 if year_on:
     year = st.sidebar.selectbox('Select the year of sale', options=np.sort(gb_model_to_year[model]))
 else:
-    year = 'All'    
+    year = 'All'   
+
 min_hp = st.sidebar.slider('Select the minimum horsepower you want', min_value=int(min_hp_of_model[model]), max_value=int(max_hp_of_model[model]), value=0, step=10)
 
 # Create a new dataframe based on the selection
@@ -74,10 +75,37 @@ with tab1:
     st.write("Dataframe (based on your selection)")
     st.write(selected_data)
 
+# Machine Learning
+with tab2:
+    st.header('Machine Learning')
+    st.write("In this section, I provide a brief overview of the Exploratory Data Analysis (EDA) and the key metrics involved in a regression-based Machine Learning project. Please note that this section does not include a prediction function using the trained model, as the pricing depends on many more variables (features) than those included in the model. To avoid creating misleading impressions or expectations, I have chosen not to offer this feature here.")
+    heatmap = sns.heatmap(data[["mileage","hp","year of sale","price"]].corr(), annot=True)
+    st.subheader("Correlation Matrix")
+    st.pyplot(heatmap.get_figure())
+
+    # dict with number of cars sold per make
+    make_dict = { i: data[data["make"]==i].shape[0] for i in data["make"].unique()}
+    # get the top 5 brands by number of cars sold
+    top_5_brands = sorted(make_dict, key=make_dict.get, reverse=True)[:5]
+    top_5 = data[data["make"].isin(top_5_brands)]
+    top_5.reset_index(drop=True, inplace=True)
+
+    st.subheader("Like in the Task mentioned, I will focus on the top 5 brands by number of cars sold.")
+    st.write("The top 5 brands are:", top_5_brands)
+    st.plotly_chart(px.histogram(top_5, x='price', title='Histogram of the price of the top 5 brands'))
+
+    st.subheader("Machine Learning Metrics")
+    st.write("The trained model is a Random Forest Regressor and performed with the following metrics:")
+    st.write("Mean Squared Error: 5105570.0142824715")
+    st.write("Mean Absolute Error: 1313.0174672063786")
+    st.write("R2 Score: 0.9408354526238328")
+    st.image("predictive_true_comp.png", caption="Comparison of the predicted and true prices")
+
+
 # Sunburst chart
 with tab3:
-    st.write("This Chart let you explore the selected cars in a sunburst chart.\n(only use the 'make' selection from the sidebar)")
-    st.write("(only use the 'make' selection from the sidebar)")
+    st.write("This Chart let you explore the sales volume per brand in a sunburst chart.")
+    st.write("(only use the 'brand' selection from the sidebar)")
     fig = px.sunburst(
         data_frame= data[data['make'] == make],
         path=['make', 'model','offerType', 'fuel', 'year of sale'],
