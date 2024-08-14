@@ -1,6 +1,6 @@
 ## Demo App
 
-![Streamlit App](https://bayzero91-autoscout-analytics-project-v2-as24-dashboard-nlajvx.streamlit.app/)
+https://bayzero91-autoscout-analytics-project-v2-as24-dashboard-nlajvx.streamlit.app/
 
 ### 1. Project Overview
 
